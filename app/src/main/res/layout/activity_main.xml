@@ -49,7 +49,7 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/imageButton"
+                android:id="@+id/sync_btn"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginRight="5dp"
@@ -120,7 +120,7 @@
                     android:textSize="12sp" />
 
                 <TextView
-                    android:id="@+id/textView8"
+                    android:id="@+id/pm10_con"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -130,7 +130,7 @@
                     android:textSize="34sp" />
 
                 <TextView
-                    android:id="@+id/textView10"
+                    android:id="@+id/pm10_stat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
@@ -163,7 +163,7 @@
                     android:textSize="12sp" />
 
                 <TextView
-                    android:id="@+id/textView9"
+                    android:id="@+id/pm25_con"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -173,7 +173,7 @@
                     android:textSize="34sp" />
 
                 <TextView
-                    android:id="@+id/textView11"
+                    android:id="@+id/pm25_stat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
