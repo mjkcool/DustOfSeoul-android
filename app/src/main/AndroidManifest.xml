@@ -4,9 +4,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_applogo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_applogo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DustOfSeoul">
         <activity android:name=".MainActivity">
@@ -18,4 +18,9 @@
         </activity>
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--위치 권환-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 </manifest>
