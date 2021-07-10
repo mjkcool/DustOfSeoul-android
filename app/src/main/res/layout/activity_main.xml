@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:text="미세먼지, 서울"
             android:textColor="#ffffff"
-            android:textSize="26sp" />
+            android:textSize="30sp" />
 
         <TextView
             android:id="@+id/desc01"
@@ -36,7 +36,7 @@
 
         <View
             android:id="@+id/view_line01"
-            android:layout_width="200dp"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_margin="10dp"
             android:background="#ffffff" />
@@ -118,7 +118,7 @@
                     android:includeFontPadding="false"
                     android:text="미세먼지 (pm10)"
                     android:textColor="#000000"
-                    android:textSize="12sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/pm10_con"
@@ -128,7 +128,8 @@
                     android:layout_marginBottom="5dp"
                     android:includeFontPadding="false"
                     android:text="농도"
-                    android:textSize="34sp" />
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/pm10_stat"
@@ -136,7 +137,8 @@
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
                     android:text="상태"
-                    android:textSize="16sp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
@@ -161,7 +163,7 @@
                     android:includeFontPadding="false"
                     android:text="초미세먼지 (pm2.5)"
                     android:textColor="#000000"
-                    android:textSize="12sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/pm25_con"
@@ -171,7 +173,8 @@
                     android:layout_marginBottom="5dp"
                     android:includeFontPadding="false"
                     android:text="농도"
-                    android:textSize="34sp" />
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/pm25_stat"
@@ -179,7 +182,8 @@
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
                     android:text="상태"
-                    android:textSize="16sp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
