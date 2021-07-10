@@ -1,37 +1,39 @@
 package com.mjkcool.dustofseoul
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.icu.lang.UCharacter.GraphemeClusterBreak.L
-import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
+import com.mjkcool.dustofseoul.kakaodata.Coord2regioncode
+import com.mjkcool.dustofseoul.kakaodata.KakaoAPI
+import com.mjkcool.dustofseoul.kakaodata.kakaoAPIRetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.jar.Manifest
-import kotlin.math.round
+
 
 class MainActivity : AppCompatActivity() {
-
+    //미세먼지 등급
     private val STAT_LEVEL = mapOf(0 to "GOOD", 30 to "NORMAL", 80 to "BAD", 150 to "WORST")
-    //서울시 구 이름 리스트
 
-
+    //Datetime formatter
     @RequiresApi(Build.VERSION_CODES.O)
     private val DatetimeFormatter = DateTimeFormatter.ofPattern("M월 d일 h:mm")
-
 
     //XML VIEW COMPONENTS
     private lateinit var mainLayout: ConstraintLayout
@@ -41,11 +43,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var conPm25View: TextView //초미세먼지 농도
     private lateinit var statPm10View: TextView //미세먼지 상태
     private lateinit var statPm25View: TextView //초미세먼지 상태
-
     private lateinit var syncBtn: ImageButton
 
+    //위치 불러오기 매니저
     lateinit var mLocationManager: LocationManager
-    lateinit var mLocationListener: LocationListener
+
+    private var kakaoApi = kakaoAPIRetrofitClient.apiService
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -53,9 +56,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //서울시 구 이름 리스트
         val GU_NAMES: Array<String> = resources.getStringArray(R.array.location_gu_array)
 
-        Log.d("구 리스트", GU_NAMES[0])
+
+
+
+
 
         //Initialize XML components
         mainLayout = findViewById(R.id.rootlayout)
@@ -150,20 +157,43 @@ class MainActivity : AppCompatActivity() {
             var currentLatLng = mLocationManager.getLastKnownLocation(locationProvider)
 
 
-            nowLocationView.text = getGu(currentLatLng?.latitude, currentLatLng?.longitude)
+            getGu(currentLatLng?.latitude, currentLatLng?.longitude)
+
+            //Connect Dataseoul API
+
         }
     }
 
-    private fun getGu(latitude: Double?, longitude: Double?): String {
-        
-
-
-        return ""
+    private fun getGu(latitude: Double?, longitude: Double?){
+        callkakaoApi(latitude.toString(), longitude.toString())
     }
 
 
     private fun makeSnackBar(s: String) {
         Snackbar.make(mainLayout, s, Snackbar.LENGTH_LONG).show()
+    }
+
+    fun callkakaoApi(lat: String, lon: String) { //only called by method 'getGu'
+        //var returnval = "위치 로드 실패" //response value of this method
+
+        //Connect Kakao API
+        kakaoApi.getApiGu(key = KakaoAPI.API_KEY, x = lon, y = lat)
+            .enqueue(object : Callback<Coord2regioncode> {
+                override fun onResponse(call: Call<Coord2regioncode>, response: Response<Coord2regioncode>) {
+                    var gu = response.body()!!.documents[0].region_2depth_name
+                    nowLocationView.text = gu
+
+                }
+                override fun onFailure(call: Call<Coord2regioncode>, t: Throwable) {
+                    nowLocationView.text = "위치 로드 실패"
+                }
+
+            })
+    }
+
+    fun callDataSeoulApi(){
+        //Connect Dataseoul API
+
     }
 
 }
