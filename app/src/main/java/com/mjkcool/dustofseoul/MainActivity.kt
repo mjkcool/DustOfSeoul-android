@@ -5,11 +5,14 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color.rgb
 import android.graphics.Paint
+import android.location.Location
 import android.location.LocationManager
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -21,6 +24,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
+import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
@@ -64,6 +69,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appInfoTxt: TextView
 
     private lateinit var mLocationManager: LocationManager //위치 불러오기 매니저
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     //API client manager
     private var kakaoApi = kakaoAPIRetrofitClient.apiService
@@ -79,9 +85,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         //서울시 구 이름 리스트
         GU_NAMES = resources.getStringArray(R.array.location_gu_array)
-
 
         //Initialize XML components
         mainLayout = findViewById(R.id.rootlayout)
@@ -100,6 +106,9 @@ class MainActivity : AppCompatActivity() {
         fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in)
         fadeOutAnim = AnimationUtils.loadAnimation(this, R.anim.fade_out)
 
+        mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
         showInfoBtn.setOnClickListener {
             appInfoTxt.visibility = View.VISIBLE
             appInfoTxt.startAnimation(fadeInAnim)
@@ -109,10 +118,9 @@ class MainActivity : AppCompatActivity() {
             }, 2000L)
         }
 
-
         //최초 위치 권한 요청 &  날짜시간 sync
-        tedPermission()
         getTime()
+        tedPermission()
 
         syncBtn.setOnClickListener {
             sync()
@@ -141,13 +149,46 @@ class MainActivity : AppCompatActivity() {
             var intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.me.go.kr/mamo/web/index.do?menuId=16201"))
             startActivity(intent)
         }
+
+
+        if(checkLocationPermission()){ //위치 권한 허용시
+            val locationCallback = object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    if (locationResult != null) {
+                        return
+                    }
+                    for (location in locationResult.locations) {
+                        if (location != null) {
+                            val latitude = location.latitude
+                            val longitude = location.longitude
+                            getGu(latitude, longitude)
+                        }
+                    }
+                }
+            }
+            val locationRequest = LocationRequest.create()
+            locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            locationRequest.interval = 20 * 1000
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun getNetworkState(): Boolean {
+        var networkManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return networkManager.activeNetwork != null
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sync(){
-        getTime() //현재 시간 표시
-        getLocation() //위치권한 받기 & 위치 불러오기
-        //makeSnackBar("정보를 새로고침했습니다.", Snackbar.LENGTH_SHORT)
+        if(getNetworkState()){ //인터넷 연결시
+            getTime() //현재 시간 표시
+            getLocation() //위치권한 받기 & 위치 불러오기
+            //makeSnackBar("정보를 새로고침했습니다.", Snackbar.LENGTH_SHORT)
+        }else{
+            makeSnackBar("인터넷에 연결되어 있지 않습니다", Snackbar.LENGTH_LONG)
+        }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -178,28 +219,39 @@ class MainActivity : AppCompatActivity() {
             .check()
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun getLocation(){
-        mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if(getNetworkState()) { //인터넷 연결시
+            if(checkLocationPermission()){
+                //위도&경도 좌표값 불러오기 with 네트워크
+                val locationProvider = LocationManager.NETWORK_PROVIDER
+                var currentLatLng = mLocationManager.getLastKnownLocation(locationProvider)
 
+                if(currentLatLng == null){
+                    nowLocationView.text = "위치정보 OFF"
+                    makeSnackBar("위치 정보를 켜주세요", Snackbar.LENGTH_LONG)
+                }else{
+                    getGu(currentLatLng?.latitude, currentLatLng?.longitude)
+                }
+            }
+        }else{
+            makeSnackBar("인터넷에 연결되어 있지 않습니다", Snackbar.LENGTH_LONG)
+            nowLocationView.text = "인터넷 OFF"
+        }
+
+    }
+
+    private fun checkLocationPermission(): Boolean {
         if(ContextCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED){
-
-            //위도&경도 좌표값 불러오기 with 네트워크
-            val locationProvider = LocationManager.NETWORK_PROVIDER
-            var currentLatLng = mLocationManager.getLastKnownLocation(locationProvider)
-
-            if(currentLatLng == null){
-                nowLocationView.text = "위치정보 OFF"
-                makeSnackBar("위치 정보를 켜주세요", Snackbar.LENGTH_LONG)
-            }else{
-                getGu(currentLatLng?.latitude, currentLatLng?.longitude)
-            }
+            ) == PackageManager.PERMISSION_GRANTED) { //위치 권한 허용시
+            return true
         }
+        return false
     }
 
     private fun getGu(latitude: Double?, longitude: Double?){
@@ -217,11 +269,15 @@ class MainActivity : AppCompatActivity() {
             .enqueue(object : Callback<Coord2regioncode> {
                 @RequiresApi(Build.VERSION_CODES.O)
                 override fun onResponse(call: Call<Coord2regioncode>, response: Response<Coord2regioncode>) {
-                    //Get information of 'gu' location
-                    var gu = response.body()!!.documents[0].region_2depth_name
-                    nowLocationView.text = gu //sync에 표시
-                    //Spinner에 표시
-                    spinner.setSelection(GU_NAMES.indexOf(gu))
+                    if(response.body()!!.documents[0].region_1depth_name == "서울특별시"){
+                        //Get information of 'gu' location
+                        var gu = response.body()!!.documents[0].region_2depth_name
+                        nowLocationView.text = gu //sync에 표시
+                        //Spinner에 표시
+                        spinner.setSelection(GU_NAMES.indexOf(gu))
+                    }else{
+                        nowLocationView.text = "서울 외 지역"
+                    }
                 }
                 override fun onFailure(call: Call<Coord2regioncode>, t: Throwable) {
                     nowLocationView.text = "위치 로드 실패"
@@ -232,12 +288,11 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     fun callDataSeoulApi(gu: String){
         var now = LocalDateTime.now()
-        var formatting = ""
-        if(now.hour == 0){
+        var formatting = if(now.hour == 0){
             var yesterday = now.minusDays(1)
-            formatting = leadingZeros(yesterday.year, 4) + leadingZeros(yesterday.monthValue, 2) + leadingZeros(yesterday.dayOfMonth, 2) + 23
+            leadingZeros(yesterday.year, 4) + leadingZeros(yesterday.monthValue, 2) + leadingZeros(yesterday.dayOfMonth, 2) + 23
         }else{
-            formatting = leadingZeros(now.year, 4) + leadingZeros(now.monthValue, 2) + leadingZeros(now.dayOfMonth, 2) + leadingZeros(now.hour-1, 2)
+            leadingZeros(now.year, 4) + leadingZeros(now.monthValue, 2) + leadingZeros(now.dayOfMonth, 2) + leadingZeros(now.hour-1, 2)
         }
 
         //Connect Dataseoul API

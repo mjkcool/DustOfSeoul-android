@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mjkcool.dustofseoul">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_applogo"
@@ -17,12 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-<!--        <meta-data-->
-<!--            android:name="com.kakao.sdk.AppKey"-->
-<!--            android:value="ffecce8a6c7b6cb09a8878972fff3d02" /> &lt;!&ndash; 네이티브 앱 키 설정 &ndash;&gt;-->
     </application>
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!--위치 권환-->
