@@ -1,5 +1,6 @@
 package com.mjkcool.dustofseoul
 
+import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
@@ -17,8 +18,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Base64
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -112,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in)
         fadeOutAnim = AnimationUtils.loadAnimation(this, R.anim.fade_out)
 
-        mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        mLocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         showInfoBtn.setOnClickListener {
@@ -196,7 +195,7 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun getNetworkState(): Boolean {
-        var networkManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        var networkManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         return networkManager.activeNetwork != null
     }
 
@@ -225,7 +224,7 @@ class MainActivity : AppCompatActivity() {
             override fun onPermissionGranted() {
                 getLocation()
             }
-            override fun onPermissionDenied(deniedPermissions: ArrayList<String>?) {
+            override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
                 makeSnackBar("설정에서 권한을 허가 해주세요.", Snackbar.LENGTH_LONG)
             }
         }
@@ -234,8 +233,8 @@ class MainActivity : AppCompatActivity() {
             .setRationaleMessage("서비스 사용을 위해서 위치 권한이 필요합니다.")
             .setDeniedMessage("설정에서 권한을 설정할 수 있습니다.")
             .setPermissions(
-                android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
             )
             .check()
     }
@@ -265,10 +264,10 @@ class MainActivity : AppCompatActivity() {
     private fun checkLocationPermission(): Boolean {
         if(ContextCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED) { //위치 권한 허용시
             return true
         }
