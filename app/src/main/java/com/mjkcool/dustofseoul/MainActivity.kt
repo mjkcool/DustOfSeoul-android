@@ -9,13 +9,17 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.gun0912.tedpermission.PermissionListener
@@ -56,6 +60,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var syncBtn: LinearLayout
     private lateinit var spinner: Spinner
     private lateinit var moveToOfficialPage: Button
+    private lateinit var showInfoBtn: LinearLayout
+    private lateinit var appInfoTxt: TextView
 
     private lateinit var mLocationManager: LocationManager //위치 불러오기 매니저
 
@@ -64,6 +70,9 @@ class MainActivity : AppCompatActivity() {
     private var dataSeoulApi = dataSeoulAPIRetrofitClient.apiService
 
     private lateinit var GU_NAMES: Array<String>
+
+    private lateinit var fadeInAnim: Animation
+    private lateinit var fadeOutAnim: Animation
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,6 +94,21 @@ class MainActivity : AppCompatActivity() {
         syncBtn = findViewById(R.id.sync_comp_layout)
         moveToOfficialPage = findViewById(R.id.move_to_dust_page)
         moveToOfficialPage.paintFlags = moveToOfficialPage.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        showInfoBtn = findViewById(R.id.show_info_app_btn)
+        appInfoTxt = findViewById(R.id.info_msg)
+
+        fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+        fadeOutAnim = AnimationUtils.loadAnimation(this, R.anim.fade_out)
+
+        showInfoBtn.setOnClickListener {
+            appInfoTxt.visibility = View.VISIBLE
+            appInfoTxt.startAnimation(fadeInAnim)
+            Handler().postDelayed({
+                appInfoTxt.startAnimation(fadeOutAnim)
+                appInfoTxt.visibility = View.INVISIBLE
+            }, 2000L)
+        }
+
 
         //최초 위치 권한 요청 &  날짜시간 sync
         tedPermission()

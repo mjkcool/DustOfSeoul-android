@@ -29,6 +29,7 @@
                 android:textSize="30sp" />
 
             <LinearLayout
+                android:id="@+id/show_info_app_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -45,7 +46,6 @@
                     android:textColor="#ffffff" />
 
                 <ImageView
-                    android:id="@+id/imageView"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_marginLeft="3dp"
@@ -60,10 +60,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:alpha="0.5"
-                android:background="@drawable/spinner_outline"
                 android:gravity="center"
                 android:includeFontPadding="false"
-                android:text="1시간 전의 평균 미세먼지 농도를 나타냅니다"
+                android:text="전 시간의 평균 미세먼지 농도를 나타냅니다"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp"
                 android:visibility="invisible" />
