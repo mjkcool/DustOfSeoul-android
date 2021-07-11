@@ -4,6 +4,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\Users\\minjeong\\.android\\dustofseoul.jks')
+            storePassword '25554812J'
+            keyAlias 'key0'
+            keyPassword '25554812J'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 

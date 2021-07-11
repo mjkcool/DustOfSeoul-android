@@ -1,11 +1,15 @@
 package com.mjkcool.dustofseoul
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.NameNotFoundException
 import android.graphics.Color.rgb
 import android.graphics.Paint
-import android.location.Location
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.Uri
@@ -13,7 +17,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.Settings
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
@@ -22,16 +26,13 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import com.mjkcool.dustofseoul.dataseouldata.TimeAverageAirQuality
 import com.mjkcool.dustofseoul.dataseouldata.dataSeoulAPIRetrofitClient
-import com.mjkcool.dustofseoul.dataseouldata.dataSeoulAPIService
 import com.mjkcool.dustofseoul.dataseouldata.dataseoulAPI
 import com.mjkcool.dustofseoul.kakaodata.Coord2regioncode
 import com.mjkcool.dustofseoul.kakaodata.KakaoAPI
@@ -39,6 +40,8 @@ import com.mjkcool.dustofseoul.kakaodata.kakaoAPIRetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -63,10 +66,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var statPm10View: TextView //미세먼지 상태
     private lateinit var statPm25View: TextView //초미세먼지 상태
     private lateinit var syncBtn: LinearLayout
+    private lateinit var syncIcon: ImageView
     private lateinit var spinner: Spinner
     private lateinit var moveToOfficialPage: Button
     private lateinit var showInfoBtn: LinearLayout
     private lateinit var appInfoTxt: TextView
+    private lateinit var applogoBtn: ImageButton
 
     private lateinit var mLocationManager: LocationManager //위치 불러오기 매니저
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -85,7 +90,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         //서울시 구 이름 리스트
         GU_NAMES = resources.getStringArray(R.array.location_gu_array)
 
@@ -98,10 +102,12 @@ class MainActivity : AppCompatActivity() {
         statPm10View = findViewById(R.id.pm10_stat)
         statPm25View = findViewById(R.id.pm25_stat)
         syncBtn = findViewById(R.id.sync_comp_layout)
+        syncIcon = findViewById(R.id.sync_btn)
         moveToOfficialPage = findViewById(R.id.move_to_dust_page)
         moveToOfficialPage.paintFlags = moveToOfficialPage.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         showInfoBtn = findViewById(R.id.show_info_app_btn)
         appInfoTxt = findViewById(R.id.info_msg)
+        applogoBtn = findViewById(R.id.applogo_btn)
 
         fadeInAnim = AnimationUtils.loadAnimation(this, R.anim.fade_in)
         fadeOutAnim = AnimationUtils.loadAnimation(this, R.anim.fade_out)
@@ -118,11 +124,26 @@ class MainActivity : AppCompatActivity() {
             }, 2000L)
         }
 
+        applogoBtn.setOnClickListener {
+
+        }
+
         //최초 위치 권한 요청 &  날짜시간 sync
         getTime()
         tedPermission()
 
+
+        var rotateanim = ObjectAnimator.ofFloat(syncIcon, "rotation", 360F).apply {
+            duration = 1000
+            addListener(object : AnimatorListenerAdapter(){
+                override fun onAnimationEnd(animation: Animator?) {
+
+                }
+            })
+        }
+
         syncBtn.setOnClickListener {
+            rotateanim.start()
             sync()
         }
 
@@ -138,7 +159,8 @@ class MainActivity : AppCompatActivity() {
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                callDataSeoulApi(GU_NAMES[position])
+                if(getNetworkState()) callDataSeoulApi(GU_NAMES[position])
+                else makeSnackBar("인터넷에 연결되어 있지 않습니다", Snackbar.LENGTH_LONG)
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
@@ -149,7 +171,6 @@ class MainActivity : AppCompatActivity() {
             var intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.me.go.kr/mamo/web/index.do?menuId=16201"))
             startActivity(intent)
         }
-
 
         if(checkLocationPermission()){ //위치 권한 허용시
             val locationCallback = object : LocationCallback() {
@@ -236,7 +257,7 @@ class MainActivity : AppCompatActivity() {
             }
         }else{
             makeSnackBar("인터넷에 연결되어 있지 않습니다", Snackbar.LENGTH_LONG)
-            nowLocationView.text = "인터넷 OFF"
+            nowLocationView.text = "위치 로드 실패"
         }
 
     }
@@ -310,7 +331,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 override fun onFailure(call: Call<TimeAverageAirQuality>, t: Throwable) {
-                    t.message?.let { Log.d("실패", it) }
+                    makeSnackBar("미세먼지 정보 불러오기에 실패했습니다", Snackbar.LENGTH_SHORT)
                 }
             })
     }

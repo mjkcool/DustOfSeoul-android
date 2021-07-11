@@ -10,7 +10,11 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -42,7 +46,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
-                    android:text="서울특별시의 실시간 미세먼지 정보"
+                    android:text="@string/app_desc"
                     android:textColor="#ffffff" />
 
                 <ImageView
@@ -62,7 +66,7 @@
                 android:alpha="0.5"
                 android:gravity="center"
                 android:includeFontPadding="false"
-                android:text="전 시간의 평균 미세먼지 농도를 나타냅니다"
+                android:text="@string/app_info"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp"
                 android:visibility="invisible" />
@@ -74,7 +78,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="10dp"
-                android:layout_marginBottom="22dp"
+                android:layout_marginBottom="30dp"
                 android:background="#ffffff" />
 
             <LinearLayout
@@ -85,10 +89,11 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <ImageButton
+                <ImageView
                     android:id="@+id/sync_btn"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:layout_gravity="center"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
                     android:background="#00FFFFFF"
@@ -273,13 +278,22 @@
             android:id="@+id/move_to_dust_page"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
             android:layout_marginBottom="30dp"
             android:background="#00FFFFFF"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:text="미세먼지 등급/바로알기"
-            android:textSize="14sp"
-            android:layout_gravity="bottom|center_horizontal"/>
+            android:textSize="14sp" />
+
+        <ImageButton
+            android:id="@+id/applogo_btn"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="right|top"
+            android:layout_margin="10dp"
+            android:background="@drawable/ic_applogo_round"
+            android:elevation="0dp" />
 
     </FrameLayout>
 
