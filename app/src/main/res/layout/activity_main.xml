@@ -8,186 +8,282 @@
     android:background="@drawable/bg_gradient"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/title01"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="미세먼지, 서울"
-            android:textColor="#ffffff"
-            android:textSize="30sp" />
-
-        <TextView
-            android:id="@+id/desc01"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="서울특별시의 실시간 미세먼지 정보"
-            android:textColor="#ffffff" />
-
-        <View
-            android:id="@+id/view_line01"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_margin="10dp"
-            android:background="#ffffff" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/sync_comp_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <ImageButton
-                android:id="@+id/sync_btn"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginRight="5dp"
-                android:layout_weight="1"
-                android:background="#00FFFFFF"
-                android:clickable="true"
-                app:srcCompat="@drawable/ic_icon_refresh" />
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingBottom="20dp">
 
             <TextView
-                android:id="@+id/nowtime_textview"
+                android:id="@+id/title01"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_weight="1"
-                android:text="현재 시간"
-                android:textColor="#ffffff" />
+                android:text="미세먼지, 서울"
+                android:textColor="#ffffff"
+                android:textSize="30sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="6dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/desc01"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:text="서울특별시의 실시간 미세먼지 정보"
+                    android:textColor="#ffffff" />
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginLeft="3dp"
+                    android:layout_weight="1"
+                    android:alpha="0.7"
+                    android:background="@drawable/ic_info" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/info_msg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="/"
-                android:textColor="#ffffff" />
+                android:layout_gravity="right"
+                android:alpha="0.5"
+                android:background="@drawable/spinner_outline"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="1시간 전의 평균 미세먼지 농도를 나타냅니다"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:visibility="invisible" />
 
-            <TextView
-                android:id="@+id/nowlocation_textview"
+            <View
+                android:id="@+id/view_line01"
+                android:layout_width="200dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="22dp"
+                android:background="#ffffff" />
+
+            <LinearLayout
+                android:id="@+id/sync_comp_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_weight="1"
-                android:text="위치"
-                android:textColor="#ffffff" />
+                android:layout_margin="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/sync_btn"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:background="#00FFFFFF"
+                    android:clickable="true"
+                    app:srcCompat="@drawable/ic_icon_refresh" />
+
+                <TextView
+                    android:id="@+id/nowtime_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="현재 시간"
+                    android:textColor="#ffffff" />
+
+                <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="/"
+                    android:textColor="#ffffff" />
+
+                <TextView
+                    android:id="@+id/nowlocation_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="위치"
+                    android:textColor="#ffffff" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="25dp"
+                android:background="@drawable/spinner_outline"
+                android:padding="1dp">
+
+                <Spinner
+                    android:id="@+id/gu_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:background="#00FFFFFF"
+                    android:gravity="center"
+                    android:spinnerMode="dropdown" />
+
+                <ImageButton
+                    android:id="@+id/imageButton2"
+                    android:layout_width="12dp"
+                    android:layout_height="6dp"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_marginRight="12dp"
+                    android:background="@drawable/spinner_down_btn" />
+
+            </FrameLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card02_pm25"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardMaxElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:id="@+id/pm10_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="5dp"
+                        android:includeFontPadding="false"
+                        android:text="미세먼지 (pm10)"
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/pm10_con"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:text="농도"
+                            android:textSize="42sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/pm10_stat"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="20dp"
+                            android:includeFontPadding="false"
+                            android:text="상태"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card01_pm10"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardMaxElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:id="@+id/pm25_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="5dp"
+                        android:includeFontPadding="false"
+                        android:text="초미세먼지 (pm2.5)"
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/pm25_con"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:text="농도"
+                            android:textSize="42sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/pm25_stat"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="20dp"
+                            android:includeFontPadding="false"
+                            android:text="상태"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
         </LinearLayout>
 
-        <Spinner
-            android:id="@+id/gu_spinner"
-            android:layout_width="140dp"
+        <Button
+            android:id="@+id/move_to_dust_page"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="15dp"
-            android:background="@drawable/spinner_outline"
-            android:gravity="center"
-            android:spinnerMode="dropdown" />
+            android:layout_marginBottom="30dp"
+            android:background="#00FFFFFF"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:text="미세먼지 등급/바로알기"
+            android:textSize="14sp"
+            android:layout_gravity="bottom|center_horizontal"/>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card02_pm25"
-            android:layout_width="200dp"
-            android:layout_height="150dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="20dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/pm10_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:text="미세먼지 (pm10)"
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/pm10_con"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:includeFontPadding="false"
-                    android:text="농도"
-                    android:textSize="40sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/pm10_stat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:text="상태"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card01_pm10"
-            android:layout_width="200dp"
-            android:layout_height="150dp"
-            android:layout_margin="10dp"
-            app:cardCornerRadius="20dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/pm25_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:text="초미세먼지 (pm2.5)"
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/pm25_con"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:includeFontPadding="false"
-                    android:text="농도"
-                    android:textSize="40sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/pm25_stat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:text="상태"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-    </LinearLayout>
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

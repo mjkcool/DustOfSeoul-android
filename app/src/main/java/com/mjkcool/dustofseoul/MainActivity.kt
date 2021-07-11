@@ -1,8 +1,12 @@
 package com.mjkcool.dustofseoul
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color.rgb
+import android.graphics.Paint
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -32,7 +36,10 @@ import java.time.format.DateTimeFormatter
 
 class MainActivity : AppCompatActivity() {
     //미세먼지 등급
-    private val STAT_LEVEL = mapOf(0 to "GOOD", 30 to "NORMAL", 80 to "BAD", 150 to "WORST")
+    private val STAT_LEVEL_PM10 = mapOf("GOOD" to 0, "NORMAL" to 30, "BAD" to 80, "WORST" to 150)
+    private val COLOR_LEVEL = mapOf("GOOD" to rgb(0, 147, 206), "NORMAL" to rgb(0, 206, 86), "BAD" to rgb(194, 158, 0), "WORST" to rgb(194, 23, 0))
+    private val STAT_LEVEL_PM25 = mapOf("GOOD" to 0, "NORMAL" to 15, "BAD" to 35, "WORST" to 75)
+    private val NAME_LEVEL = mapOf("GOOD" to "좋음", "NORMAL" to "보통", "BAD" to "나쁨", "WORST" to "매우 나쁨")
 
     //Datetime formatter
     @RequiresApi(Build.VERSION_CODES.O)
@@ -46,14 +53,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var conPm25View: TextView //초미세먼지 농도
     private lateinit var statPm10View: TextView //미세먼지 상태
     private lateinit var statPm25View: TextView //초미세먼지 상태
-    private lateinit var syncBtn: ImageButton
+    private lateinit var syncBtn: LinearLayout
+    private lateinit var spinner: Spinner
+    private lateinit var moveToOfficialPage: Button
 
-    //위치 불러오기 매니저
-    private lateinit var mLocationManager: LocationManager
+    private lateinit var mLocationManager: LocationManager //위치 불러오기 매니저
 
+    //API client manager
     private var kakaoApi = kakaoAPIRetrofitClient.apiService
     private var dataSeoulApi = dataSeoulAPIRetrofitClient.apiService
 
+    private lateinit var GU_NAMES: Array<String>
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,9 +71,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         //서울시 구 이름 리스트
-        val GU_NAMES: Array<String> = resources.getStringArray(R.array.location_gu_array)
-
-
+        GU_NAMES = resources.getStringArray(R.array.location_gu_array)
 
 
         //Initialize XML components
@@ -74,21 +82,19 @@ class MainActivity : AppCompatActivity() {
         conPm25View = findViewById(R.id.pm25_con)
         statPm10View = findViewById(R.id.pm10_stat)
         statPm25View = findViewById(R.id.pm25_stat)
-        syncBtn = findViewById(R.id.sync_btn)
-
+        syncBtn = findViewById(R.id.sync_comp_layout)
+        moveToOfficialPage = findViewById(R.id.move_to_dust_page)
+        moveToOfficialPage.paintFlags = moveToOfficialPage.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
         //최초 위치 권한 요청 &  날짜시간 sync
         tedPermission()
         getTime()
 
-
         syncBtn.setOnClickListener {
             sync()
         }
 
-
-
-        val spinner: Spinner = findViewById(R.id.gu_spinner)
+        spinner = findViewById(R.id.gu_spinner)
 
         ArrayAdapter.createFromResource(this,
             R.array.location_gu_array,
@@ -100,17 +106,17 @@ class MainActivity : AppCompatActivity() {
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-
+                callDataSeoulApi(GU_NAMES[position])
             }
-
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
             }
-
         }
 
-
-
+        moveToOfficialPage.setOnClickListener {
+            var intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.me.go.kr/mamo/web/index.do?menuId=16201"))
+            startActivity(intent)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -137,7 +143,6 @@ class MainActivity : AppCompatActivity() {
                 makeSnackBar("설정에서 권한을 허가 해주세요.", Snackbar.LENGTH_LONG)
             }
         }
-
         TedPermission.with(this)
             .setPermissionListener(permissionListener)
             .setRationaleMessage("서비스 사용을 위해서 위치 권한이 필요합니다.")
@@ -170,8 +175,6 @@ class MainActivity : AppCompatActivity() {
             }else{
                 getGu(currentLatLng?.latitude, currentLatLng?.longitude)
             }
-
-
         }
     }
 
@@ -190,14 +193,15 @@ class MainActivity : AppCompatActivity() {
             .enqueue(object : Callback<Coord2regioncode> {
                 @RequiresApi(Build.VERSION_CODES.O)
                 override fun onResponse(call: Call<Coord2regioncode>, response: Response<Coord2regioncode>) {
+                    //Get information of 'gu' location
                     var gu = response.body()!!.documents[0].region_2depth_name
-                    nowLocationView.text = gu
-                    callDataSeoulApi(gu)
+                    nowLocationView.text = gu //sync에 표시
+                    //Spinner에 표시
+                    spinner.setSelection(GU_NAMES.indexOf(gu))
                 }
                 override fun onFailure(call: Call<Coord2regioncode>, t: Throwable) {
                     nowLocationView.text = "위치 로드 실패"
                 }
-
             })
     }
 
@@ -211,7 +215,6 @@ class MainActivity : AppCompatActivity() {
         }else{
             formatting = leadingZeros(now.year, 4) + leadingZeros(now.monthValue, 2) + leadingZeros(now.dayOfMonth, 2) + leadingZeros(now.hour-1, 2)
         }
-        //Log.d("날짜시간 포맷팅", formatting)
 
         //Connect Dataseoul API
         dataSeoulApi.getApiQulity(key = dataseoulAPI.API_KEY, format = formatting, gu = gu)
@@ -224,15 +227,43 @@ class MainActivity : AppCompatActivity() {
                     else{
                         var pm10 = data.TimeAverageAirQuality.row[0].PM10
                         var pm25 = data.TimeAverageAirQuality.row[0].PM25
-                        conPm10View.text = pm10.toString()
-                        conPm25View.text = pm25.toString()
+                        setAirQulity(pm10, pm25)
                     }
                 }
-
                 override fun onFailure(call: Call<TimeAverageAirQuality>, t: Throwable) {
                     t.message?.let { Log.d("실패", it) }
                 }
             })
+    }
+
+    private fun setAirQulity(pm10: Int, pm25: Int) {
+        conPm10View.text = pm10.toString()
+        conPm25View.text = pm25.toString()
+
+        when{
+            pm10 > STAT_LEVEL_PM10["WORST"]!! -> setLevelPm10("WORST")
+            pm10 > STAT_LEVEL_PM10["BAD"]!! -> setLevelPm10("BAD")
+            pm10 > STAT_LEVEL_PM10["NORMAL"]!! -> setLevelPm10("BAD")
+            pm10 > STAT_LEVEL_PM10["GOOD"]!! -> setLevelPm10("GOOD")
+        }
+        when{
+            pm25 > STAT_LEVEL_PM25["WORST"]!! -> setLevelPm25("WORST")
+            pm25 > STAT_LEVEL_PM25["BAD"]!! -> setLevelPm25("BAD")
+            pm25 > STAT_LEVEL_PM25["NORMAL"]!! -> setLevelPm25("BAD")
+            pm25 > STAT_LEVEL_PM25["GOOD"]!! -> setLevelPm25("GOOD")
+        }
+    }
+
+    fun setLevelPm10(level: String){
+        conPm10View.setTextColor(COLOR_LEVEL[level]!!)
+        statPm10View.text = NAME_LEVEL[level]!!
+        statPm10View.setTextColor(COLOR_LEVEL[level]!!)
+    }
+
+    fun setLevelPm25(level: String){
+        conPm25View.setTextColor(COLOR_LEVEL[level]!!)
+        statPm25View.text = NAME_LEVEL[level]!!
+        statPm25View.setTextColor(COLOR_LEVEL[level]!!)
     }
 
     fun leadingZeros(num: Int, digits: Int): String {
@@ -243,5 +274,4 @@ class MainActivity : AppCompatActivity() {
         }
         return zero + time;
     }
-
 }
