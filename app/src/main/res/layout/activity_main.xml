@@ -293,7 +293,8 @@
             android:layout_gravity="right|top"
             android:layout_margin="10dp"
             android:background="@drawable/ic_applogo_round"
-            android:elevation="0dp" />
+            android:elevation="0dp"
+            android:visibility="invisible" />
 
     </FrameLayout>
 
