@@ -97,7 +97,6 @@
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
                     android:background="#00FFFFFF"
-                    android:clickable="true"
                     app:srcCompat="@drawable/ic_icon_refresh" />
 
                 <TextView
