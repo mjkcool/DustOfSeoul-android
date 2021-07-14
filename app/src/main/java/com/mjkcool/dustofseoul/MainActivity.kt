@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
     //Datetime formatter
     @RequiresApi(Build.VERSION_CODES.O)
-    private val DatetimeFormatter = DateTimeFormatter.ofPattern("M월 d일 h:mm")
+    private val DatetimeFormatter = DateTimeFormatter.ofPattern("M월 d일 h:mm a")
 
     //XML VIEW COMPONENTS
     private lateinit var mainLayout: ConstraintLayout
