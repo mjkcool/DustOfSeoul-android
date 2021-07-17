@@ -15,3 +15,6 @@
 local.properties
 /app/src/main/java/com/mjkcool/dustofseoul/key/apikey.kt
 apikey.kt
+.aab
+.apk
+/app/release/app-release.aab
