@@ -1,4 +1,4 @@
-# DustOfSeoul-android
+# DustOfSeoul Android App
 서울특별시의 실시간 미세먼지 정보
 
 |||
